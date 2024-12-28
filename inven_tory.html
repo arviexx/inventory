@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+    <style>
+        /* General Body Styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: white;
+        }
+
+        /* Centering Container */
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Full viewport height */
+            padding: 20px;
+            box-sizing: border-box;
+            margin-top: -33%;
+            margin-left: 23%;
+        }
+
+        /* Form Section Styling */
+        .form-section {
+            width: 50%;
+            max-width: 250px;
+            height: 23%; /* Maximum width of the form */
+            padding: 30px;
+            background-color: #8c8b79f5;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+           
+        }
+
+        /* Table Section and Table Section Styling */
+        .table-section {
+            margin-bottom: 50px;
+            margin-top: -15%;   
+            margin-left:24%;  
+            color: rgb(29, 1, 1);
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        }
+
+        table {
+            width: 70%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+              }
+
+        table, th, td {
+            border: 1px solid rgb(14, 1, 1);
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+            color: rgb(34, 3, 3);
+        }
+
+        /* Price and Quantity Input Styling */
+        #itemPrice, #quantityInput {
+            font-size: 16px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            display: inline-block;
+            
+        }
+        label {
+            font-size: 16px;
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+        }
+
+        input[type="number"], #itemSelect, #newItemName, #searchInput{
+            width: 100px;
+            padding: 5px;
+            margin: 5px 0;
+            border: 2px solid #e0c5c5f2;
+            border-radius: 5px;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        }
+        button {
+            padding: 10px;
+            margin: 5px;
+            border: 2px solid #ec1212f2;
+            border-radius: 5px;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+             margin-left: 1%;
+             background-color: red;
+             color:white;
+        }
+
+        /* Out of Stock Styling */
+        .out-of-stock {
+            color: red;
+            font-weight: bold;
+        }
+
+        /* Total Sales Section */
+        div strong {
+            font-size: 16px;
+            color: #141212;
+        }
+
+        #totalSales, #totalProfit {
+            font-weight: bold;
+            color: #007BFF;
+            font-size: 18px;
+        }
+
+        /* Modal overlay and modal styling */
+        #modalOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+        }
+
+        .modal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-top: 4%;
+            margin-bottom: 3%;
+            font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-style: italic;
+            color: rgb(186, 30, 30);
+           
+    }
+        .image {
+            text-align: left;
+          
+
+        }
+        .image img{
+         
+         width: 18%;
+           margin-top: 10px;
+           margin-left: 28%;
+          
+        }
+      
+        
+        #searchBtn {
+    padding: 6px 10px;
+    margin-left: 5px;
+    border: 2px solid #ec1212f2;
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: red;
+    color: white;
+    cursor: pointer;
+}
+
+#searchBtn i {
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+}
+#searchInput{
+            width: 15%;
+            padding: 5px;
+            margin: 5px 0;
+            margin-left: 51.8%;
+            border: 2px solid #e0c5c5f2;
+            border-radius: 5px;
+            font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <h1>Firecrackers Inventory Management</h1>
+    <div class="search-section">
+        <input type="text" id="searchInput" placeholder="Search by Item Name">
+        <button id="searchBtn">
+            <i class="fas fa-search"></i>
+        </button>
+    </div>
+    
+    <div class="image">
+        <img src="Firecrackers.gif">
+    </div>
+    <!-- Centering container for form -->
+    <div class="container">
+        <div class="form-section">
+        
+            <label for="itemSelect">Select Item:</label>
+            <select id="itemSelect">
+                <!-- Items will be dynamically added here -->
+            </select>
+            <button id="addItemBtn">+</button>
+           
+            <div>
+                <label for="itemPrice">Price:</label>
+                <span id="itemPrice">0</span>
+            </div>
+            <div>
+                <label for="quantityInput">Quantity:</label>
+                <input type="number" id="quantityInput" min="1">
+            </div>
+            <button id="submitBtn">Submit</button>
+            <button id="editItemBtn">Edit</button>
+            <button id="deleteItemBtn">Delete</button>
+        </div>
+    </div>
+
+    <div class="table-section">
+        <h2>Inventory Table</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Item Name</th>
+                    <th>Price</th>
+                    <th>Total Quantity</th>
+                    <th>Sold</th>
+                    <th>Remaining</th>
+                    <th>Subtotal</th>
+                    <th>Total Possible Sales</th>
+                </tr>
+            </thead>
+            <tbody id="inventoryTableBody">
+                <!-- Dynamic rows go here -->
+            </tbody>
+        </table>
+        <div>
+            <strong>Total of Possible Sales:</strong> <span id="totalPosSales">0</span>
+        </div>
+        <div>
+            <strong>Total Sales:</strong> <span id="totalSales">0</span>
+        </div>
+        <div>
+            <strong>Total Profit:</strong> <span id="totalProfit">0</span>
+        </div>
+    </div>
+
+    <!-- Add/Edit Item Modals -->
+    <div id="modalOverlay"></div>
+    <div id="addItemModal" class="modal" style="display: none;">
+        <h3>Add New Item</h3>
+        <label for="newItemName">Item Name:</label>
+        <input type="text" id="newItemName" placeholder="Item Name">
+        <label for="newItemPrice">Selling Price:</label>
+        <input type="number" id="newItemPrice" placeholder="Item Price">
+        <label for="origItemPrice">Original Price:</label>
+        <input type="number" id="origItemPrice" placeholder="Item Price">
+        <label for="newItemQuantity">Quantity:</label>
+        <input type="number" id="newItemQuantity" placeholder="Quantity">
+        <button id="saveNewItem">Save</button>
+        <button id="cancelNewItem">Cancel</button>
+    </div>
+    <div id="editItemModal" class="modal" style="display: none;">
+        <h3>Edit Item</h3>
+        <label for="editItemName">Item Name:</label>
+        <input type="text" id="editItemName" disabled>
+        <label for="editItemPrice">Item Price:</label>
+        <input type="number" id="editItemPrice">
+        <label for="editorigItemPrice">Original Price:</label>
+        <input type="number" id="editorigItemPrice">
+        <label for="editItemQuantity">Quantity:</label>
+        <input type="number" id="editItemQuantity">
+        <button id="saveEditItem">Save</button>
+        <button id="cancelEditItem">Cancel</button>
+    </div>
+
+    <script>
+        let items = {}; // Object to store all items
+        let selectedItemName = null;
+
+        const itemSelect = document.getElementById('itemSelect');
+        const inventoryTableBody = document.getElementById('inventoryTableBody');
+        const totalSales = document.getElementById('totalSales');
+        const totalProfit = document.getElementById('totalProfit');
+        const searchInput = document.getElementById('searchInput');
+        const addItemBtn = document.getElementById('addItemBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const editItemBtn = document.getElementById('editItemBtn');
+        const deleteItemBtn = document.getElementById('deleteItemBtn');
+        const addItemModal = document.getElementById('addItemModal');
+        const editItemModal = document.getElementById('editItemModal');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const saveNewItem = document.getElementById('saveNewItem');
+        const saveEditItem = document.getElementById('saveEditItem');
+        const cancelNewItem = document.getElementById('cancelNewItem');
+        const cancelEditItem = document.getElementById('cancelEditItem');
+
+        // Load items from localStorage (if any)
+        function loadInventory() {
+            const savedItems = localStorage.getItem('items');
+            if (savedItems) {
+                items = JSON.parse(savedItems);
+                updateInventoryTable();
+                updateItemSelectOptions();
+            }
+        }
+
+        // Save inventory to localStorage
+        function saveInventory() {
+            localStorage.setItem('items', JSON.stringify(items));
+        }
+        itemSelect.addEventListener('change', () => {
+            const selectedItem = items[itemSelect.value];
+            itemPrice.textContent = selectedItem ? selectedItem.price : '0';
+        });
+
+        // Submit button functionality
+        document.getElementById('submitBtn').addEventListener('click', () => {
+            const itemName = itemSelect.value;
+            const quantity = parseInt(quantityInput.value);
+            if (!items[itemName] || !quantity || quantity < 1) {
+                alert('Please select a valid item and quantity.');
+                return;
+            }
+
+            const item = items[itemName];
+            if (item.quantity < quantity) {
+                alert(`Insufficient stock for ${itemName}. Available: ${item.quantity}`);
+                return;
+            }
+
+            item.sold += quantity;
+            item.quantity -= quantity;
+
+            saveInventory();
+            updateInventoryTable();
+        });
+
+  // Update the inventory table
+        function updateInventoryTable() {
+            inventoryTableBody.innerHTML = '';
+            let total = 0;
+            let totalPossibleSales = 0;
+            let totalItemProfit = 0; // Initialize total profit variable
+
+            for (const [name, item] of Object.entries(items)) {
+                const subtotal = item.sold * item.price;
+                total += subtotal;
+                const possibleSales = item.totalQuantity * item.price;
+                totalPossibleSales += possibleSales;
+
+                // Calculate profit for the item using price - original price
+                const itemProfit = item.sold * (item.price - item.origprice); // Profit for this item
+                totalItemProfit += itemProfit; // Add to total profit
+
+                const outOfStock = item.quantity === 0 ? 'Out of Stock' : '';
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${name}</td>
+                    <td>${item.price}</td>
+                    <td>${item.totalQuantity}</td>
+                    <td>${item.sold}</td>
+                    <td class="${outOfStock ? 'out-of-stock' : ''}">${outOfStock || item.quantity}</td>
+                    <td>${subtotal}</td>
+                    <td>${possibleSales}</td>
+                `;
+                inventoryTableBody.appendChild(row);
+            }
+            totalPosSales.textContent = totalPossibleSales;
+            totalSales.textContent = total;
+            totalProfit.textContent = totalItemProfit; // Display total profit
+            updateItemSelectOptions();
+        }
+
+        // Update item select dropdown options
+        function updateItemSelectOptions() {
+            itemSelect.innerHTML = '';
+            for (const [name] of Object.entries(items)) {
+                const option = document.createElement('option');
+                option.value = name;
+                option.textContent = name;
+                itemSelect.appendChild(option);
+            }
+        }
+
+        // Add new item button click event
+        addItemBtn.addEventListener('click', () => {
+            addItemModal.style.display = 'block';
+            modalOverlay.style.display = 'block';
+        });
+
+        // Cancel new item modal
+        cancelNewItem.addEventListener('click', () => {
+            addItemModal.style.display = 'none';
+            modalOverlay.style.display = 'none';
+        });
+
+        // Save new item event
+        saveNewItem.addEventListener('click', () => {
+            const newItemName = document.getElementById('newItemName').value;
+            const newItemPrice = parseFloat(document.getElementById('newItemPrice').value);
+            const origItemPrice = parseFloat(document.getElementById('origItemPrice').value);
+            const newItemQuantity = parseInt(document.getElementById('newItemQuantity').value);
+
+            if (newItemName && newItemPrice > 0 && origItemPrice > 0 && newItemQuantity > 0) {
+                items[newItemName] = {
+                    name: newItemName,
+                    price: newItemPrice,
+                    origprice: origItemPrice,  // Save the original price
+                    totalQuantity: newItemQuantity,
+                    quantity: newItemQuantity,
+                    sold: 0
+                };
+                saveInventory();
+                updateInventoryTable();
+                addItemModal.style.display = 'none';
+                modalOverlay.style.display = 'none';
+            } else {
+                alert('Please fill all fields correctly.');
+            }
+        });
+
+        // Edit item button click event
+        editItemBtn.addEventListener('click', () => {
+            selectedItemName = itemSelect.value;
+            const selectedItem = items[selectedItemName];
+            if (selectedItem) {
+                document.getElementById('editItemName').value = selectedItemName;
+                document.getElementById('editItemPrice').value = selectedItem.price;
+                document.getElementById('editorigItemPrice').value = selectedItem.origprice;
+                document.getElementById('editItemQuantity').value = selectedItem.totalQuantity;
+                editItemModal.style.display = 'block';
+                modalOverlay.style.display = 'block';
+            }
+        });
+
+        // Save edit item event
+        saveEditItem.addEventListener('click', () => {
+            const editedItemName = document.getElementById('editItemName').value;
+            const editedItemPrice = parseFloat(document.getElementById('editItemPrice').value);
+            const editedorigItemPrice = parseFloat(document.getElementById('editorigItemPrice').value);
+            const editedItemQuantity = parseInt(document.getElementById('editItemQuantity').value);
+
+            if (
+                editedItemName &&
+                !isNaN(editedItemPrice) &&
+                editedItemPrice > 0 &&
+                !isNaN(editedorigItemPrice) &&
+                editedorigItemPrice > 0 &&
+                !isNaN(editedItemQuantity) &&
+                editedItemQuantity >= 0
+            ) {
+                const item = items[editedItemName];
+                const quantityDifference = editedItemQuantity - (item.totalQuantity - item.quantity);
+
+                item.price = editedItemPrice;
+                item.origprice = editedorigItemPrice;  // Update the original price
+                item.quantity = item.quantity + quantityDifference;
+                item.totalQuantity = editedItemQuantity;
+
+                // Recalculate profit
+                item.profit = (item.price - item.origprice) * (item.totalQuantity - item.quantity);
+
+                saveInventory();
+                updateInventoryTable();
+                editItemModal.style.display = 'none';
+                modalOverlay.style.display = 'none';
+            } else {
+                alert('Please ensure all fields have valid values.');
+            }
+        });
+
+        // Cancel edit item modal
+        cancelEditItem.addEventListener('click', () => {
+            editItemModal.style.display = 'none';
+            modalOverlay.style.display = 'none';
+        });
+
+        // Delete item button click event
+        deleteItemBtn.addEventListener('click', () => {
+            const selectedItemName = itemSelect.value;
+            if (selectedItemName && items[selectedItemName]) {
+                delete items[selectedItemName];
+                saveInventory();
+                updateInventoryTable();
+            }
+        });
+
+        // Load inventory when the page loads
+        window.onload = loadInventory;
+    
+      // Search button functionality
+// Search functionality
+const searchBtn = document.getElementById('searchBtn');
+
+searchBtn.addEventListener('click', () => {
+    const searchTerm = searchInput.value.toLowerCase().trim();
+    if (searchTerm) {
+        filterInventoryTable(searchTerm);
+    } else {
+        updateInventoryTable(); // Show all items if the search box is empty
+    }
+});
+
+searchInput.addEventListener('input', () => {
+    const searchTerm = searchInput.value.toLowerCase().trim();
+    if (!searchTerm) {
+        updateInventoryTable(); // Reset the table if the input is cleared
+    }
+});
+
+function filterInventoryTable(searchTerm) {
+    inventoryTableBody.innerHTML = ''; // Clear current table
+    let total = 0;
+    let totalPossibleSales = 0;
+    let totalItemProfit = 0;
+
+    for (const [name, item] of Object.entries(items)) {
+        if (name.toLowerCase().includes(searchTerm)) {
+            const subtotal = item.sold * item.price;
+            total += subtotal;
+            const possibleSales = item.totalQuantity * item.price;
+            totalPossibleSales += possibleSales;
+
+            const itemProfit = item.sold * (item.price - item.origprice);
+            totalItemProfit += itemProfit;
+
+            const outOfStock = item.quantity === 0 ? 'Out of Stock' : '';
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${name}</td>
+                <td>${item.price}</td>
+                <td>${item.totalQuantity}</td>
+                <td>${item.sold}</td>
+                <td class="${outOfStock ? 'out-of-stock' : ''}">${outOfStock || item.quantity}</td>
+                <td>${subtotal}</td>
+                <td>${possibleSales}</td>
+            `;
+            inventoryTableBody.appendChild(row);
+        }
+    }
+    totalPosSales.textContent = totalPossibleSales;
+    totalSales.textContent = total;
+    totalProfit.textContent = totalItemProfit;
+}
+
+
+
+
+    </script>
+</body>
+</html>
